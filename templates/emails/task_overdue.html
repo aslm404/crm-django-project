@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Task Overdue</title>
+</head>
+<body>
+    <h2>Task Overdue: {{ task.title }}</h2>
+    <p>
+        The task <strong>{{ task.title }}</strong> in project <strong>{{ task.project.title }}</strong>
+        is {{ days_overdue }} day(s) overdue.
+    </p>
+    <p>
+        Due Date: {{ task.due_date }}<br>
+        Priority: {{ task.get_priority_display }}<br>
+        Status: {{ task.get_status_display }}
+    </p>
+    <p>
+        <a href="{{ site_url }}{% url 'tasks:detail' task.id %}">View Task</a>
+    </p>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{% load report_tags %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ dashboard.name }}</title>
+</head>
+<body>
+    <h1>{{ dashboard.name }}</h1>
+    <p>{{ dashboard.description }}</p>
+    {% for widget in dashboard.widgets.all %}
+        <h2>{{ widget.title }} ({{ widget.get_widget_type_display }})</h2>
+        <pre>{{ widget_data|dictget:widget.id|safe }}</pre>
+    {% endfor %}
+</body>
+</html>

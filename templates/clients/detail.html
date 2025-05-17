@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Client: {{ object.company }}{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+                <!-- Header with Back Button -->
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                <h2 class="fw-bold text-primary-emphasis">
+                    <i class="bi bi-person-lines-fill"></i> Client {{ object.title }}
+                </h2>
+                <a href="{% url 'clients:list' %}" class="btn btn-outline-secondary d-flex align-items-center gap-2 px-4 py-2 rounded-pill">
+                    <i class="bi bi-arrow-left"></i> Back to Client
+                </a>
+            </div>
+            <!-- Client Details -->
+            <div class="card shadow-sm border-0 bg-light mb-5">
+                <div class="card-body p-5">
+                    <h1 class="display-5 fw-bold text-muted mb-4">
+                        <i class="bi bi-building me-2"></i> {{ object.company }}
+                    </h1>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <p><strong>User:</strong> {{ object.user.username }}</p>
+                            <p><strong>Company:</strong> {{ object.company|default:"Not provided" }}</p>
+                            <p><strong>Address:</strong> {{ object.address|default:"Not provided" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Phone:</strong> {{ object.phone|default:"Not provided" }}</p>
+                            <p><strong>VAT Number:</strong> {{ object.vat_number|default:"Not provided" }}</p>
+                            <p><strong>Website:</strong> 
+                                {% if object.website %}
+                                    <a href="{{ object.website }}" class="client-detail-link hover-underline" target="_blank">{{ object.website }}</a>
+                                {% else %}
+                                    Not provided
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projects Section -->
+            <div class="card shadow-sm border-0 bg-light mb-5">
+                <div class="card-body p-5">
+                    <h3 class="fw-bold text-muted mb-4">
+                        <i class="bi bi-briefcase-fill me-2"></i> Projects
+                    </h3>
+                    {% if projects %}
+                        <ul class="list-group">
+                            {% for project in projects %}
+                                <li class="list-group-item">
+                                    {{ project.title }} 
+                                    <span class="badge bg-{{ project.status_badge|default:'secondary' }} ms-2">
+                                        {{ project.status }}
+                                    </span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <div class="alert alert-light text-center py-4 rounded-3">
+                            <i class="bi bi-info-circle text-muted mb-3" style="font-size: 1.5rem;"></i>
+                            <p class="mb-0 text-muted">No projects found.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Notes Section -->
+            <div class="card shadow-sm border-0 bg-light mb-5">
+                <div class="card-body p-5">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3 class="fw-bold text-muted">
+                            <i class="bi bi-sticky-fill me-2"></i> Notes
+                        </h3>
+                        <a href="{% url 'clients:note_create' client_pk=object.pk %}" 
+                           class="btn btn-primary rounded-pill px-4 py-2 client-detail-link">
+                            <i class="bi bi-plus-circle me-2"></i> Add Note
+                        </a>
+                    </div>
+                    {% if notes %}
+                        <ul class="list-group">
+                            {% for note in notes %}
+                                <li class="list-group-item">
+                                    <p class="mb-2">{{ note.content }}</p>
+                                    <p class="text-muted small mb-0">
+                                        by {{ note.created_by.username }} at {{ note.created_at }}
+                                    </p>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <div class="alert alert-light text-center py-4 rounded-3">
+                            <i class="bi bi-info-circle text-muted mb-3" style="font-size: 1.5rem;"></i>
+                            <p class="mb-0 text-muted">No notes found.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Files Section -->
+            <div class="card shadow-sm border-0 bg-light">
+                <div class="card-body p-5">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3 class="fw-bold text-muted">
+                            <i class="bi bi-files me-2"></i> Files
+                        </h3>
+                        <a href="{% url 'clients:file_upload' client_pk=object.pk %}" 
+                           class="btn btn-primary rounded-pill px-4 py-2 client-detail-link">
+                            <i class="bi bi-upload me-2"></i> Upload File
+                        </a>
+                    </div>
+                    {% if files %}
+                        <ul class="list-group">
+                            {% for file in files %}
+                                <li class="list-group-item">
+                                    <p class="mb-2">
+                                        <a href="{{ file.file.url }}" 
+                                           class="file-link hover-underline" 
+                                           target="_blank">
+                                            {{ file.description|default:"Unnamed file" }}
+                                        </a>
+                                    </p>
+                                    <p class="text-muted small mb-0">
+                                        by {{ file.uploaded_by.username }} at {{ file.uploaded_at|default:file.created_at }}
+                                    </p>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <div class="alert alert-light text-center py-4 rounded-3">
+                            <i class="bi bi-info-circle text-muted mb-3" style="font-size: 1.5rem;"></i>
+                            <p class="mb-0 text-muted">No files found.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

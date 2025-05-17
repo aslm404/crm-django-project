@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Recurring Tasks</title>
+</head>
+<body>
+    <h1>Recurring Tasks</h1>
+    <a href="{% url 'tasks:recurring_task_create' %}">Create Recurring Task</a>
+    <ul>
+        {% for recurring_task in object_list %}
+            <li>{{ recurring_task.base_task.title }} (Next Run: {{ recurring_task.next_run }})</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

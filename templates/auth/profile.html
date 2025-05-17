@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}User Profile{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-info bg-opacity-25 text-dark border-0">
+                    <h4 class="mb-0">User Profile</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6 class="text-muted">Full Name</h6>
+                        <p class="fw-semibold text-dark">{{ user.get_full_name }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="text-muted">Email Address</h6>
+                        <p class="fw-semibold text-dark">{{ user.email }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="text-muted">Phone Number</h6>
+                        <p class="fw-semibold text-dark">{{ user.phone }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="text-muted">Role</h6>
+                        <p class="fw-semibold text-dark">{{ user.get_role_display }}</p>
+                    </div>
+
+                    {% if user.role != 'client' %}
+                        <div class="mb-3">
+                            <h6 class="text-muted">Department</h6>
+                            <p class="fw-semibold text-dark">{{ user.department }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <h6 class="text-muted">Job Title</h6>
+                            <p class="fw-semibold text-dark">{{ user.job_title }}</p>
+                        </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <h6 class="text-muted">Company Name</h6>
+                        <p class="fw-semibold text-dark">{{ user.company_name }}</p>
+                    </div>
+
+                    <div class="text-end">
+                        <a href="{% url 'team:profile_edit' %}" class="btn btn-outline-info rounded-pill px-4">
+                            <i class="bi bi-pencil-square me-1"></i> Edit Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

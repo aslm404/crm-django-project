@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ user.get_full_name }}'s Profile{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <h2 class="fw-bold text-primary-emphasis">
+            <i class="bi bi-person-circle me-2"></i>
+            {{ user.get_full_name }}'s Profile
+        </h2>
+        <a href="{% url 'team:profile_edit' %}" class="btn btn-primary d-flex align-items-center gap-2 px-4 py-2 rounded-pill">
+            <i class="bi bi-pencil-square"></i> Edit Profile
+        </a>
+    </div>
+
+    <div class="card shadow-sm bg-light border-0 rounded-3">
+        <div class="card-body p-5">
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center gap-3">
+                        <i class="bi bi-person-fill text-primary" style="font-size: 1.5rem;"></i>
+                        <div>
+                            <h6 class="fw-medium text-muted mb-1">Username</h6>
+                            <p class="mb-0">{{ user.username }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center gap-3">
+                        <i class="bi bi-envelope-fill text-primary" style="font-size: 1.5rem;"></i>
+                        <div>
+                            <h6 class="fw-medium text-muted mb-1">Email</h6>
+                            <p class="mb-0">{{ user.email }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center gap-3">
+                        <i class="bi bi-briefcase-fill text-primary" style="font-size: 1.5rem;"></i>
+                        <div>
+                            <h6 class="fw-medium text-muted mb-1">Role</h6>
+                            <p class="mb-0">{{ user.get_role_display|default:"N/A" }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% if user.role != 'client' %}
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center gap-3">
+                            <i class="bi bi-building-fill text-primary" style="font-size: 1.5rem;"></i>
+                            <div>
+                                <h6 class="fw-medium text-muted mb-1">Department</h6>
+                                <p class="mb-0">{{ user.department|default:"N/A" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center gap-3">
+                            <i class="bi bi-person-badge-fill text-primary" style="font-size: 1.5rem;"></i>
+                            <div>
+                                <h6 class="fw-medium text-muted mb-1">Job Title</h6>
+                                <p class="mb-0">{{ user.job_title|default:"N/A" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center gap-3">
+                        <i class="bi bi-shop text-primary" style="font-size: 1.5rem;"></i>
+                        <div>
+                            <h6 class="fw-medium text-muted mb-1">Company Name</h6>
+                            <p class="mb-0">{{ user.company_name|default:"N/A" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

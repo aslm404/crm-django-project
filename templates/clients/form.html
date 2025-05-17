@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if object %}Edit{% else %}Create{% endif %} Client
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header with Back Button -->
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                    <h2 class="fw-semibold mb-4 text-primary-emphasis">
+                        <i class="bi {% if object %}bi-pencil-fill{% else %}bi-person-plus-fill{% endif %} me-2"></i>
+                        {% if object %}Edit{% else %}Create{% endif %} Client
+                    </h2>
+                <a href="{% url 'clients:list' %}" class="btn btn-outline-secondary d-flex align-items-center gap-2 px-4 py-2 rounded-pill">
+                    <i class="bi bi-arrow-left"></i> Back to Client
+                </a>
+            </div>
+            <!-- Form Card -->
+            <div class="card shadow-sm border-0 bg-light-subtle">
+                <div class="card-body p-4">
+                    <!-- <h2 class="fw-semibold mb-4 text-primary-emphasis">
+                        <i class="bi {% if object %}bi-pencil-fill{% else %}bi-person-plus-fill{% endif %} me-2"></i>
+                        {% if object %}Edit{% else %}Create{% endif %} Client
+                    </h2> -->
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            {% for field in form %}
+                                {% if field.name == 'user' and request.user.role == 'client' %}
+                                    <!-- Hidden user field for client role -->
+                                    <input type="hidden" name="user" value="{{ request.user.id }}">
+                                {% else %}
+                                    <div class="col-md-{% if field.name in 'user address payment_terms' %}12{% else %}6{% endif %}">
+                                        <label for="{{ field.id_for_label }}" class="form-label text-primary-emphasis">
+                                            {{ field.label }}
+                                            {% if field.field.required %}
+                                                <span class="text-danger">*</span>
+                                            {% endif %}
+                                        </label>
+                                        {{ field }}
+                                        {% if field.errors %}
+                                            <div class="text-danger small mt-1">
+                                                {{ field.errors|join:" " }}
+                                            </div>
+                                        {% endif %}
+                                        {% if field.help_text %}
+                                            <div class="form-text text-muted small">
+                                                {{ field.help_text }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn btn-success rounded-pill px-4">
+                                <i class="bi bi-check-circle me-2"></i> Save
+                            </button>
+                            <a href="{% url 'clients:list' %}" class="btn btn-outline-secondary px-4 py-2 rounded-pill">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

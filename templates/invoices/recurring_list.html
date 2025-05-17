@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Recurring Invoices</title>
+</head>
+<body>
+    <h1>Recurring Invoices</h1>
+    <a href="{% url 'invoices:recurring_create' %}">Create New</a>
+    <ul>
+        {% for recurring in object_list %}
+            <li>{{ recurring.base_invoice.invoice_number }} - {{ recurring.recurrence }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

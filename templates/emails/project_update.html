@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Project Update</title>
+</head>
+<body>
+    <h1>Weekly Update for {{ project.title }}</h1>
+    <p>Status: {{ project.get_status_display }}</p>
+    <p>Progress: {{ project.progress_percentage }}%</p>
+    <h2>Tasks</h2>
+    <ul>
+        {% for task in tasks %}
+            <li>{{ task.title }} - {{ task.get_status_display }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

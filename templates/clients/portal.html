@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Client Portal: {{ object.company }}</title>
+</head>
+<body>
+    <h1>{{ object.company }} Portal</h1>
+    <h2>Active Projects</h2>
+    <ul>
+        {% for project in active_projects %}
+            <li>{{ project.title }} - {{ project.status }}</li>
+        {% endfor %}
+    </ul>
+    <h2>Recent Invoices</h2>
+    <ul>
+        {% for invoice in recent_invoices %}
+            <li>{{ invoice.invoice_number }} - {{ invoice.total }} ({{ invoice.status }})</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

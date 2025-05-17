@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Invoice #{{ object.invoice_number }}{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <!-- Header with Back Button -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <h2 class="fw-bold text-primary-emphasis">
+            <i class="bi bi-receipt me-2"></i> Invoice #{{ object.invoice_number }}
+        </h2>
+        <a href="{% url 'invoices:list' %}" class="btn btn-outline-secondary d-flex align-items-center gap-2 px-4 py-2 rounded-pill">
+            <i class="bi bi-arrow-left"></i> Back to Invoices
+        </a>
+    </div>
+
+    <!-- Invoice Details Card -->
+    <div class="card shadow-sm border-0 bg-light rounded-3 mb-5">
+        <div class="card-body p-5">
+            <h3 class="fw-semibold text-muted mb-4">Invoice Details</h3>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <label class="form-label fw-medium text-muted">Invoice Number</label>
+                    <p class="mb-0">{{ object.invoice_number }}</p>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-medium text-muted">Client</label>
+                    <p class="mb-0">{{ object.client.user }}</p>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-medium text-muted">Issue Date</label>
+                    <p class="mb-0">{{ object.issue_date|date:"F d, Y" }}</p>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-medium text-muted">Due Date</label>
+                    <p class="mb-0">{{ object.due_date|date:"F d, Y" }}</p>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-medium text-muted">Status</label>
+                    <p class="mb-0">
+                        <span class="badge 
+                            {% if object.status == 'paid' %}bg-success
+                            {% elif object.status == 'sent' %}bg-info
+                            {% else %}bg-warning{% endif %}">
+                            {{ object.get_status_display|title }}
+                        </span>
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-medium text-muted">Total Amount</label>
+                    <p class="mb-0">${{ object.total_amount|floatformat:2 }}</p>
+                </div>
+            </div>
+            <!-- Action Buttons (Edit/Delete for Admins) -->
+            {% if user.is_superuser or request.user.role == 'admin' %}
+                <div class="d-flex justify-content-end gap-3 mt-5">
+                    <a href="#" class="btn btn-outline-danger px-4 py-2 rounded-pill">
+                        <i class="bi bi-trash me-2"></i> Delete
+                    </a>
+                    <a href="{% url 'invoices:update' invoice.id %}" class="btn btn-primary px-4 py-2 rounded-pill">
+                        <i class="bi bi-pencil me-2"></i> Edit
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Invoice Items Card -->
+    <div class="card shadow-sm border-0 bg-light rounded-3 mb-5">
+        <div class="card-body p-5">
+            <h3 class="fw-semibold text-muted mb-4">Invoice Items</h3>
+            {% if line_items %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4 py-3">Description</th>
+                                <th class="py-3">Quantity</th>
+                                <th class="py-3">Unit Price</th>
+                                <th class="py-3">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in line_items %}
+                                <tr>
+                                    <td class="ps-4 py-3">{{ item.description }}</td>
+                                    <td class="py-3">{{ item.quantity }}</td>
+                                    <td class="py-3">${{ item.unit_price|floatformat:2 }}</td>
+                                    <td class="py-3">${{ item.total|floatformat:2 }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted">No items added to this invoice.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

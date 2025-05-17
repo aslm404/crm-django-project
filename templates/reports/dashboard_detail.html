@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard: {{ object.name }}{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Header -->
+            <div class="card shadow-sm border-0 bg-light mb-5">
+                <div class="card-body p-5">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+                        <div>
+                            <h1 class="display-5 fw-bold text-dark mb-3">{{ object.name }}</h1>
+                            <p class="text-muted mb-2">{{ object.description|default:"No description provided" }}</p>
+                            <p class="text-muted small">
+                                Shared: <span class="fw-medium {% if object.is_shared %}text-success{% else %}text-danger{% endif %}">
+                                    {{ object.is_shared|yesno:"Yes,No" }}
+                                </span>
+                            </p>
+                        </div>
+                        <div class="d-flex flex-wrap gap-3">
+                            <a href="{% url 'reports:dashboard_update' object.pk %}" 
+                               class="btn btn-primary rounded-pill px-4 py-2">
+                                <i class="bi bi-pencil-square me-2"></i> Edit Dashboard
+                            </a>
+                            <a href="{% url 'reports:widget_create' object.pk %}" 
+                               class="btn btn-success rounded-pill px-4 py-2">
+                                <i class="bi bi-plus-circle me-2"></i> Add Widget
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Widgets Section -->
+            <div class="card shadow-sm border-0 bg-light mb-5">
+                <div class="card-body p-5">
+                    <h3 class="fw-bold text-dark mb-4">
+                        <i class="bi bi-grid-fill me-2"></i> Widgets
+                    </h3>
+                    {% if object.widgets.all %}
+                        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                            {% for widget in object.widgets.all %}
+                                <div class="col">
+                                    <div class="card widget-card shadow-sm border-0 h-100">
+                                        <div class="card-body p-4">
+                                            <div class="widget-header">
+                                                <h5 class="card-title fw-bold text-dark mb-0">{{ widget.title }}</h5>
+                                                <span class="text-muted small">{{ widget.get_widget_type_display }}</span>
+                                            </div>
+                                            <div class="position-relative">
+                                                <canvas id="widget-{{ widget.id }}" 
+                                                        class="widget-canvas"
+                                                        role="img" 
+                                                        aria-label="Chart displaying {{ widget.title }} data"></canvas>
+                                            </div>
+                                            <div class="mt-3 text-end">
+                                                <a href="{% url 'reports:widget_update' widget.pk %}" 
+                                                   class="text-primary text-decoration-none hover-underline small">
+                                                    <i class="bi bi-pencil me-1"></i> Edit Widget
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-light text-center py-4 rounded-3">
+                            <i class="bi bi-info-circle text-muted mb-3" style="font-size: 1.5rem;"></i>
+                            <p class="mb-0 text-muted">No widgets available. Click "Add Widget" to get started!</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Export Options -->
+            <div class="card shadow-sm border-0 bg-light">
+                <div class="card-body p-5">
+                    <h3 class="fw-bold text-dark mb-4">
+                        <i class="bi bi-download me-2"></i> Export Options
+                    </h3>
+                    <div class="d-flex flex-wrap gap-3">
+                        <a href="{% url 'reports:dashboard_export' object.pk 'pdf' %}" 
+                           class="btn btn-outline-secondary rounded-pill px-4 py-2">
+                            <i class="bi bi-filetype-pdf me-2"></i> Export PDF
+                        </a>
+                        <a href="{% url 'reports:dashboard_export' object.pk 'csv' %}" 
+                           class="btn btn-outline-secondary rounded-pill px-4 py-2">
+                            <i class="bi bi-filetype-csv me-2"></i> Export CSV
+                        </a>
+                        <a href="{% url 'reports:dashboard_export' object.pk 'excel' %}" 
+                           class="btn btn-outline-secondary rounded-pill px-4 py-2">
+                            <i class="bi bi-filetype-xls me-2"></i> Export Excel
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js and Widget JavaScript -->
+<script src="{% static 'js/chart.min.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const widgets = {{ object.widgets.all|length }};
+        if (widgets > 0) {
+            {% for widget in object.widgets.all %}
+                fetch('{% url 'reports:widget_data' widget.id %}')
+                    .then(response => {
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        return response.json();
+                    })
+                    .then(data => {
+                        const chartTypeMap = {
+                            'bar_chart': 'bar',
+                            'line_chart': 'line',
+                            'pie_chart': 'pie',
+                            'table': 'bar',
+                            'metric': 'bar',
+                            'progress': 'bar'
+                        };
+                        new Chart(document.getElementById('widget-{{ widget.id }}'), {
+                            type: chartTypeMap['{{ widget.widget_type }}'] || 'bar',
+                            data: data.data,
+                            options: {
+                                ...data.config,
+                                responsive: true,
+                                maintainAspectRatio: false
+                            }
+                        });
+                    })
+                    .catch(error => console.error('Error loading widget {{ widget.id }}:', error));
+            {% endfor %}
+        }
+    });
+</script>
+{% endblock %}

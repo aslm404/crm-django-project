@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Clients{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Header Section -->
+            <div class="d-flex justify-content-between align-items-center mb-5 flex-wrap gap-3">
+                <div>
+                    <h2 class="fw-bold text-primary-emphasis">
+                        <i class="bi bi-person-lines-fill me-2"></i> {% if request.user.role == 'client' %}Your {% endif %}Clients
+                    </h2>
+                    {% if clients %}
+                        <span class="client-badge badge bg-light border border-primary text-primary rounded-pill px-3 py-2">
+                            {{ clients|length }} Client{{ clients|length|pluralize }}
+                        </span>
+                    {% endif %}
+                </div>
+                {% if request.user.role == 'admin' %}
+                    <a href="{% url 'clients:create' %}" class="btn btn-primary rounded-pill px-4 py-2 d-flex align-items-center">
+                        <i class="bi bi-person-plus-fill me-2"></i> Create New Client
+                    </a>
+                {% endif %}
+            </div>
+
+            <!-- Clients Section -->
+            <div class="card shadow-sm border-0 bg-light">
+                <div class="card-body p-5">
+                    {% if clients %}
+                        <div class="table-responsive">
+                            <table class="client-table table table-striped table-hover align-middle mb-0">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th class="ps-4 py-3">Name</th>
+                                        <th class="py-3">Company</th>
+                                        <th class="py-3">Email</th>
+                                        <th class="py-3">Phone</th>
+                                        <th class="py-3">Projects</th>
+                                        <th class="py-3 text-end pe-4">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for client in clients %}
+                                        <tr>
+                                            <td class="ps-4 py-3">{{ client.user.username }}</td>
+                                            <td class="py-3">{{ client.company|default:client.user.get_full_name }}</td>
+                                            <td class="py-3">{{ client.user.email|default:"N/A" }}</td>
+                                            <td class="py-3">{{ client.user.phone|default:"N/A" }}</td>
+                                            <td class="py-3">
+                                                <span class="client-badge badge bg-info text-info rounded-pill">
+                                                    {{ client.projects.count|default:0 }}
+                                                </span>
+                                            </td>
+                                            <td class="py-3 text-end pe-4">
+                                                <div class="d-flex gap-2 justify-content-end">
+                                                    <a href="{% url 'clients:detail' client.id %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                                        <i class="bi bi-eye me-1"></i> View
+                                                    </a>
+                                                    {% if request.user.role == 'admin' or request.user.role == 'staff' or client.user == request.user %}
+                                                        <a href="{% url 'clients:update' client.id %}" class="btn btn-sm btn-outline-warning rounded-pill px-3">
+                                                            <i class="bi bi-pencil me-1"></i> Edit
+                                                        </a>
+                                                    {% endif %}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-light text-center py-4 rounded-3">
+                            <i class="bi bi-info-circle text-muted mb-3" style="font-size: 1.5rem;"></i>
+                            <p class="mb-0 text-muted">
+                                No clients found.
+                                {% if request.user.role == 'admin' %}
+                                    Start by adding one!
+                                {% endif %}
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Time Entries</title>
+</head>
+<body>
+    <h1>Time Entries</h1>
+    <a href="{% url 'tasks:time_entry_create' %}">Create Time Entry</a>
+    <ul>
+        {% for entry in object_list %}
+            <li>{{ entry.task.title }}: {{ entry.start_time }} - {{ entry.duration }} {% if entry.is_billed %} (Billed) {% endif %}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

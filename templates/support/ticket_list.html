@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Support Tickets{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-5 flex-wrap gap-3">
+        <h2 class="fw-bold text-primary-emphasis">
+            <i class="bi bi-ticket-detailed me-2"></i> Support Tickets
+        </h2>
+        {% if user.is_authenticated and user.is_superuser or request.user.role == 'admin' %}
+            <a href="{% url 'support:ticket_create' %}" class="btn btn-primary d-flex align-items-center gap-2 px-4 py-2 rounded-pill">
+                <i class="bi bi-plus-circle"></i> Create New Ticket
+            </a>
+        {% endif %}
+    </div>
+
+    {% if tickets %}
+        <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4 py-3">Ticket ID</th>
+                                <th class="py-3">Subject</th>
+                                <th class="py-3">Status</th>
+                                <th class="py-3">Priority</th>
+                                <th class="py-3 text-end pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ticket in tickets %}
+                                <tr class="transition-all">
+                                    <td class="ps-4 py-3">{{ ticket.ticket_number }}</td>
+                                    <td class="py-3">{{ ticket.subject }}</td>
+                                    <td class="py-3">
+                                        <span class="badge 
+                                            {% if ticket.status == 'open' %}bg-success
+                                            {% elif ticket.status == 'in_progress' %}bg-warning
+                                            {% elif ticket.status == 'resolved' %}bg-info
+                                            {% elif ticket.status == 'closed' %}bg-secondary
+                                            {% else %}bg-info{% endif %}">
+                                            {{ ticket.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td class="py-3">
+                                        <span class="badge 
+                                            {% if ticket.priority == 'critical' %}bg-danger
+                                            {% elif ticket.priority == 'high' %}bg-danger
+                                            {% elif ticket.priority == 'medium' %}bg-warning
+                                            {% elif ticket.priority == 'low' %}bg-success
+                                            {% else %}bg-info{% endif %}">
+                                            {{ ticket.get_priority_display }}
+                                        </span>
+                                    </td>
+                                    <td class="py-3 text-end pe-4">
+                                        <a href="{% url 'support:ticket_detail' ticket.id %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                            <i class="bi bi-eye me-1"></i> View
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-light text-center py-5 rounded-3 shadow-sm bg-light">
+            <i class="bi bi-info-circle text-muted mb-3" style="font-size: 1.5rem;"></i>
+            <p class="mb-0 text-muted">No tickets found. Click "Create New Ticket" to get started!</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

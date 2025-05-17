@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Reports{% endblock %}
+{% block content %}
+    <h1 class="mb-4">Reports</h1>
+    <div class="row">
+        {% for report in reports %}
+            <div class="col-md-4 mb-4">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ report.title }}</h5>
+                        <p class="card-text">{{ report.description }}</p>
+                        <a href="{% url 'report_detail' report.id %}" class="btn btn-primary">View Report</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12"><p>No reports available.</p></div>
+        {% endfor %}
+    </div>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Update Ticket Status{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 bg-light">
+                <div class="card-body p-5">
+                    <h3 class="fw-bold text-primary-emphasis mb-4">
+                        <i class="bi bi-arrow-repeat me-2"></i> Update Ticket Status
+                    </h3>
+                    <form method="post" class="item-form">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            {% for field in form %}
+                                <div class="col-md-6">
+                                    <label for="{{ field.id_for_label }}" class="form-label text-primary-emphasis">{{ field.label }}</label>
+                                    {{ field }}
+                                    {% if field.errors %}
+                                        <div class="invalid-feedback">
+                                            {{ field.errors|join:" " }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <div class="mt-4 d-flex gap-3">
+                            <button type="submit" class="btn btn-primary rounded-pill px-4 py-2">
+                                <i class="bi bi-save me-2"></i> Update
+                            </button>
+                            <a href="{% url 'support:ticket_detail' object.pk %}" 
+                               class="btn btn-outline-secondary rounded-pill px-4 py-2">
+                                <i class="bi bi-x-circle me-2"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

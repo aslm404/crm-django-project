@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ object.title }} - Project Details{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <!-- Header with Back Button -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <h2 class="fw-bold text-primary-emphasis">
+            <i class="bi bi-kanban me-2"></i> {{ object.title }}
+        </h2>
+        <a href="{% url 'projects:list' %}" class="btn btn-outline-secondary d-flex align-items-center gap-2 px-4 py-2 rounded-pill">
+            <i class="bi bi-arrow-left"></i> Back to Projects
+        </a>
+    </div>
+
+    <!-- Project Details Card -->
+    <div class="card shadow-sm border-0 bg-light rounded-3 mb-5">
+        <div class="card-body p-5">
+            <h3 class="fw-semibold text-muted mb-4">Project Details</h3>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <label class="form-label fw-medium text-muted">Title</label>
+                    <p class="mb-0">{{ object.title }}</p>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-medium text-muted">Client</label>
+                    <p class="mb-0">{{ object.client.user }}</p>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-medium text-muted">Status</label>
+                    <p class="mb-0">
+                        <span class="badge 
+                            {% if object.status == 'completed' %}bg-success
+                            {% elif object.status == 'in_progress' %}bg-info
+                            {% else %}bg-warning{% endif %}">
+                            {{ object.status|title }}
+                        </span>
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-medium text-muted">Budget</label>
+                    <p class="mb-0">${{ object.budget|floatformat:2 }}</p>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-medium text-muted">Start Date</label>
+                    <p class="mb-0">{{ object.start_date|date:"F d, Y" }}</p>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-medium text-muted">Deadline</label>
+                    <p class="mb-0">{{ object.deadline|date:"F d, Y" }}</p>
+                </div>
+                <div class="col-12">
+                    <label class="form-label fw-medium text-muted">Description</label>
+                    <p class="mb-0">{{ object.description|default:"No description provided." }}</p>
+                </div>
+            </div>
+            
+                        <!-- Action Buttons (Edit/Delete for Admins) -->
+            {% if user.is_superuser or request.user.role == 'admin' %}
+                <div class="d-flex justify-content-end gap-3 mt-5">
+                    <a href="{% url 'tasks:delete' object.pk %}" class="btn btn-outline-danger px-4 py-2 rounded-pill">
+                        <i class="bi bi-trash me-2"></i> Delete
+                    </a>
+                    <a href="{% url 'projects:update' object.pk %}" class="btn btn-primary px-4 py-2 rounded-pill">
+                        <i class="bi bi-pencil me-2"></i> Edit
+                    </a>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+    <!-- Team Members Card -->
+    <div class="card shadow-sm border-0 bg-light rounded-3 mb-5">
+        <div class="card-body p-5">
+            <h3 class="fw-semibold text-muted mb-4">Team Members</h3>
+            {% if team_members %}
+                <div class="row g-4">
+                    {% for member in team_members %}
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center gap-3">
+                                {% if member.profile_picture %}
+                                    <img src="{{ member.profile_picture.url }}" alt="{{ member.get_full_name }}" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
+                                {% else %}
+                                    <i class="bi bi-person-circle text-muted" style="font-size: 40px;"></i>
+                                {% endif %}
+                                <div>
+                                    <p class="mb-0 fw-medium">{{ member.get_full_name }}</p>
+                                    <small class="text-muted">{{ member.job_title|default:"No job title" }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted">No team members assigned to this project.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Tasks Card -->
+    <div class="card shadow-sm border-0 bg-light rounded-3">
+        <div class="card-body p-5">
+            <h3 class="fw-semibold text-muted mb-4">Tasks</h3>
+            {% if tasks %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4 py-3">Task Title</th>
+                                <th class="py-3">Status</th>
+                                <th class="py-3">Due Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for task in tasks %}
+                                <tr>
+                                    <td class="ps-4 py-3">{{ task.title }}</td>
+                                    <td class="py-3">
+                                        <span class="badge 
+                                            {% if task.status == 'completed' %}bg-success
+                                            {% elif task.status == 'in_progress' %}bg-info
+                                            {% else %}bg-warning{% endif %}">
+                                            {{ task.status|title }}
+                                        </span>
+                                    </td>
+                                    <td class="py-3">{{ task.due_date|date:"F d, Y"|default:"No due date" }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted">No tasks assigned to this project.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

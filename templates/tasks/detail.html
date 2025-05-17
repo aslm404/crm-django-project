@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Task: {{ object.title }}{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <!-- Header with Back Button -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <h2 class="fw-bold text-primary-emphasis">
+            <i class="bi bi-check-square me-2"></i> {{ object.title }}
+        </h2>
+        <a href="{% url 'projects:detail' object.project.id %}" class="btn btn-outline-secondary d-flex align-items-center gap-2 px-4 py-2 rounded-pill">
+            <i class="bi bi-arrow-left"></i> Back to Project
+        </a>
+    </div>
+
+    <!-- Task Details Card -->
+    <div class="card shadow-sm border-0 bg-light rounded-3 mb-5">
+        <div class="card-body p-5">
+            <h3 class="fw-semibold text-muted mb-4">Task Details</h3>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <label class="form-label fw-medium text-muted">Title</label>
+                    <p class="mb-0">{{ object.title }}</p>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-medium text-muted">Project</label>
+                    <p class="mb-0">
+                        <a href="{% url 'projects:detail' object.project.id %}" class="text-primary text-decoration-none">
+                            {{ object.project.title }}
+                        </a>
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-medium text-muted">Status</label>
+                    <p class="mb-0">
+                        <span class="badge 
+                            {% if object.status == 'completed' %}bg-success
+                            {% elif object.status == 'in_progress' %}bg-info
+                            {% else %}bg-warning{% endif %}">
+                            {{ object.get_status_display|title }}
+                        </span>
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-medium text-muted">Priority</label>
+                    <p class="mb-0">
+                        <span class="badge 
+                            {% if object.priority == 'high' %}bg-danger
+                            {% elif object.priority == 'medium' %}bg-warning
+                            {% else %}bg-secondary{% endif %}">
+                            {{ object.get_priority_display|title }}
+                        </span>
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-medium text-muted">Due Date</label>
+                    <p class="mb-0">{{ object.due_date|date:"F d, Y"|default:"No due date" }}</p>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-medium text-muted">Estimated Duration</label>
+                    <p class="mb-0">{{ object.estimated_duration|default:"Not specified" }}</p>
+                </div>
+                <div class="col-12">
+                    <label class="form-label fw-medium text-muted">Assignees</label>
+                    <p class="mb-0">
+                        {% if object.assignees.exists %}
+                            {% for assignee in object.assignees.all %}
+                                {{ assignee.get_full_name }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            No assignees
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            <!-- Action Buttons (Edit/Delete for Admins) -->
+            {% if user.is_superuser or request.user.role == 'admin' %}
+                <div class="d-flex justify-content-end gap-3 mt-5">
+                    <a href="{% url 'tasks:delete' object.pk %}" class="btn btn-outline-danger px-4 py-2 rounded-pill">
+                        <i class="bi bi-trash me-2"></i> Delete
+                    </a>
+                    <a href="{% url 'tasks:update' object.pk %}" class="btn btn-primary px-4 py-2 rounded-pill">
+                        <i class="bi bi-pencil me-2"></i> Edit
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Time Entries Card -->
+    <div class="card shadow-sm border-0 bg-light rounded-3">
+        <div class="card-body p-5">
+            <h3 class="fw-semibold text-muted mb-4">Time Entries</h3>
+            {% if time_entries %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4 py-3">Start Time</th>
+                                <th class="py-3">Duration</th>
+                                <th class="py-3">Billing Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for entry in time_entries %}
+                                <tr>
+                                    <td class="ps-4 py-3">{{ entry.start_time|date:"F d, Y H:i" }}</td>
+                                    <td class="py-3">{{ entry.duration }}</td>
+                                    <td class="py-3">
+                                        {% if entry.invoice %}
+                                            Billed to Invoice #{{ entry.invoice.id }}
+                                        {% else %}
+                                            Not Billed
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted">No time entries recorded for this task.</p>
+            {% endif %}
+            <!-- Timer Action -->
+            <form method="post" action="{% url 'tasks:timer_action' object.pk %}" class="mt-4">
+                {% csrf_token %}
+                <button type="submit" class="btn {% if active_timer and active_task == object %}btn-danger{% else %}btn-primary{% endif %} px-4 py-2 rounded-pill">
+                    <i class="bi {% if active_timer and active_task == object %}bi-pause{% else %}bi-play{% endif %} me-2"></i>
+                    {% if active_timer and active_task == object %}Stop Timer{% else %}Start Timer{% endif %}
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

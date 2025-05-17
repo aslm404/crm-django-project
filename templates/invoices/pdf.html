@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Invoice: {{ object.invoice_number }}</title>
+</head>
+<body>
+    <h1>Invoice: {{ object.invoice_number }}</h1>
+    <p>Client: {{ object.client.company }}</p>
+    <p>Total: {{ object.total }} {{ object.currency }}</p>
+    <p>Items:</p>
+    <ul>
+        {% for item in object.items %}
+            <li>{{ item.description }} - {{ item.quantity }} x {{ item.unit_price }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
